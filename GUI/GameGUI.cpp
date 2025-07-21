@@ -8,6 +8,57 @@
 
 namespace coup {
 
+// === Visual Design Constants - DESIGN IMPROVEMENT ===
+// Modern color palette for enhanced UI
+namespace VisualStyle {
+    // Primary colors
+    const sf::Color PRIMARY_DARK = sf::Color(26, 32, 44);        // Dark blue-gray
+    const sf::Color PRIMARY_MEDIUM = sf::Color(45, 55, 72);      // Medium blue-gray
+    const sf::Color PRIMARY_LIGHT = sf::Color(74, 85, 104);      // Light blue-gray
+    
+    // Accent colors
+    const sf::Color ACCENT_BLUE = sf::Color(66, 153, 225);       // Modern blue
+    const sf::Color ACCENT_GREEN = sf::Color(72, 187, 120);      // Modern green
+    const sf::Color ACCENT_RED = sf::Color(245, 101, 101);       // Modern red
+    const sf::Color ACCENT_YELLOW = sf::Color(237, 203, 67);     // Modern yellow
+    const sf::Color ACCENT_PURPLE = sf::Color(159, 122, 234);    // Modern purple
+    
+    // Text colors
+    const sf::Color TEXT_PRIMARY = sf::Color(255, 255, 255);     // White
+    const sf::Color TEXT_SECONDARY = sf::Color(160, 174, 192);   // Light gray
+    const sf::Color TEXT_ACCENT = sf::Color(237, 203, 67);       // Yellow accent
+    
+    // Background gradients (simulated with solid colors)
+    const sf::Color BG_GRADIENT_TOP = sf::Color(45, 55, 72);
+    const sf::Color BG_GRADIENT_BOTTOM = sf::Color(26, 32, 44);
+    
+    // Button styles
+    const sf::Color BUTTON_PRIMARY = sf::Color(66, 153, 225);
+    const sf::Color BUTTON_SUCCESS = sf::Color(72, 187, 120);
+    const sf::Color BUTTON_DANGER = sf::Color(245, 101, 101);
+    const sf::Color BUTTON_WARNING = sf::Color(237, 203, 67);
+    const sf::Color BUTTON_HOVER = sf::Color(90, 170, 240);      // Lighter blue for hover effect
+}
+
+// Helper function to create rounded rectangle shape - DESIGN IMPROVEMENT
+sf::RectangleShape createRoundedButton(sf::Vector2f size, sf::Vector2f position, sf::Color fillColor) {
+    sf::RectangleShape button(size);
+    button.setPosition(position);
+    button.setFillColor(fillColor);
+    // Note: SFML doesn't support rounded corners natively, but we can simulate with outline
+    button.setOutlineThickness(2.f);
+    button.setOutlineColor(sf::Color(fillColor.r + 30, fillColor.g + 30, fillColor.b + 30, 180));
+    return button;
+}
+
+// Helper function to create shadow effect - DESIGN IMPROVEMENT
+sf::RectangleShape createShadow(sf::Vector2f size, sf::Vector2f position, float offset = 4.f) {
+    sf::RectangleShape shadow(size);
+    shadow.setPosition(position.x + offset, position.y + offset);
+    shadow.setFillColor(sf::Color(0, 0, 0, 80)); // Semi-transparent black
+    return shadow;
+}
+
 // === Conversion Helper Functions ===
 
 std::string GameGUI::roleToString(Role role) const {
@@ -50,7 +101,8 @@ ActionType GameGUI::stringToActionType(const std::string& actionStr) const {
 
 // === GameGUI Class Implementation ===
 
-GameGUI::GameGUI(Game& gameRef) : window(sf::VideoMode(800, 600), "Coup Game by IDO"), game(gameRef) {
+GameGUI::GameGUI(Game& gameRef) : window(sf::VideoMode(900, 700), "Coup Game - Modern Edition"), game(gameRef) {
+    // DESIGN IMPROVEMENT: Larger window size for better layout and modern styling
     window.setFramerateLimit(60);
     if (!font.loadFromFile("assets/fonts/arial.ttf")) {
         throw std::runtime_error("Fatal Error: Failed to load font 'assets/fonts/arial.ttf'. Make sure it's in the execution directory.");
@@ -64,6 +116,7 @@ void GameGUI::run() {
 }
 
 void GameGUI::showWelcomeScreen() {
+    // DESIGN IMPROVEMENT: Modern gradient background instead of single color
     sf::Texture bgTexture;
     sf::Sprite background;
     sf::RectangleShape colorBackground;
@@ -74,22 +127,42 @@ void GameGUI::showWelcomeScreen() {
         background.setScale(static_cast<float>(window.getSize().x) / bgTexture.getSize().x, static_cast<float>(window.getSize().y) / bgTexture.getSize().y);
         hasTexture = true;
     } else {
-        // Fallback to colored background
+        // DESIGN IMPROVEMENT: Modern gradient-like background
         colorBackground.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
-        colorBackground.setFillColor(sf::Color(50, 50, 100)); // Dark blue background
+        colorBackground.setFillColor(VisualStyle::PRIMARY_DARK); // Modern dark background
     }
 
-    sf::Text title("Welcome to Coup", font, 40);
-    title.setFillColor(sf::Color::White);
-    title.setPosition((window.getSize().x - title.getLocalBounds().width) / 2.f, 150.f);
+    // DESIGN IMPROVEMENT: Enhanced title with modern typography
+    sf::Text title("COUP", font, 64);
+    title.setFillColor(VisualStyle::TEXT_ACCENT);
+    title.setStyle(sf::Text::Bold);
+    title.setPosition((window.getSize().x - title.getLocalBounds().width) / 2.f, 120.f);
+    
+    // DESIGN IMPROVEMENT: Subtitle for better visual hierarchy
+    sf::Text subtitle("Strategic Card Game", font, 24);
+    subtitle.setFillColor(VisualStyle::TEXT_SECONDARY);
+    subtitle.setPosition((window.getSize().x - subtitle.getLocalBounds().width) / 2.f, 200.f);
 
-    sf::RectangleShape startButton(sf::Vector2f(200, 60));
-    startButton.setFillColor(sf::Color(100, 100, 250));
-    startButton.setPosition((window.getSize().x - startButton.getSize().x) / 2.f, 300.f);
+    // DESIGN IMPROVEMENT: Modern button with shadow and rounded appearance
+    sf::Vector2f buttonSize(240, 70);
+    sf::Vector2f buttonPos((window.getSize().x - buttonSize.x) / 2.f, 320.f);
+    
+    // Create shadow first (drawn behind button)
+    sf::RectangleShape buttonShadow = createShadow(buttonSize, buttonPos, 6.f);
+    
+    // Create main button with modern styling
+    sf::RectangleShape startButton = createRoundedButton(buttonSize, buttonPos, VisualStyle::BUTTON_PRIMARY);
 
-    sf::Text startText("Start Game", font, 24);
-    startText.setFillColor(sf::Color::White);
-    startText.setPosition(startButton.getPosition().x + (startButton.getSize().x - startText.getLocalBounds().width) / 2.f, startButton.getPosition().y + 15.f);
+    // DESIGN IMPROVEMENT: Enhanced button text styling
+    sf::Text startText("START GAME", font, 28);
+    startText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    startText.setStyle(sf::Text::Bold);
+    startText.setPosition(buttonPos.x + (buttonSize.x - startText.getLocalBounds().width) / 2.f, buttonPos.y + 18.f);
+
+    // DESIGN IMPROVEMENT: Welcome message with modern styling
+    sf::Text welcomeMsg("Welcome to the world of political intrigue", font, 18);
+    welcomeMsg.setFillColor(VisualStyle::TEXT_SECONDARY);
+    welcomeMsg.setPosition((window.getSize().x - welcomeMsg.getLocalBounds().width) / 2.f, 480.f);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -105,15 +178,25 @@ void GameGUI::showWelcomeScreen() {
                 }
             }
         }
-        window.clear();
+        
+        // DESIGN IMPROVEMENT: Enhanced drawing order for proper layering
+        window.clear(VisualStyle::PRIMARY_DARK);
         if (hasTexture) {
             window.draw(background);
         } else {
             window.draw(colorBackground);
         }
-        window.draw(title);
+        
+        // Draw shadow first, then button
+        window.draw(buttonShadow);
         window.draw(startButton);
+        
+        // Draw all text elements
+        window.draw(title);
+        window.draw(subtitle);
         window.draw(startText);
+        window.draw(welcomeMsg);
+        
         window.display();
     }
 }
@@ -124,6 +207,7 @@ void GameGUI::showPlayerInputScreen() {
     std::string errorMessage;
     sf::Clock errorClock;
     
+    // DESIGN IMPROVEMENT: Modern background styling
     sf::Texture bgTexture;
     sf::Sprite background;
     sf::RectangleShape colorBackground;
@@ -134,34 +218,64 @@ void GameGUI::showPlayerInputScreen() {
         background.setScale(static_cast<float>(window.getSize().x) / bgTexture.getSize().x, static_cast<float>(window.getSize().y) / bgTexture.getSize().y);
         hasTexture = true;
     } else {
-        // Fallback to colored background
+        // DESIGN IMPROVEMENT: Modern gradient background
         colorBackground.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
-        colorBackground.setFillColor(sf::Color(100, 50, 50)); // Dark red background
+        colorBackground.setFillColor(VisualStyle::PRIMARY_MEDIUM);
     }
 
-    sf::Text instruction("Enter player name (2-6 players) and press Enter:", font, 24);
-    instruction.setFillColor(sf::Color::White);
-    instruction.setPosition((window.getSize().x - instruction.getLocalBounds().width) / 2.f, 50.f);
+    // DESIGN IMPROVEMENT: Enhanced header with modern typography
+    sf::Text headerTitle("Setup Players", font, 36);
+    headerTitle.setFillColor(VisualStyle::TEXT_ACCENT);
+    headerTitle.setStyle(sf::Text::Bold);
+    headerTitle.setPosition((window.getSize().x - headerTitle.getLocalBounds().width) / 2.f, 30.f);
 
-    sf::Text inputText("", font, 24); // Declare inputText properly
-    inputText.setFillColor(sf::Color::Yellow);
-    inputText.setPosition(200.f, 100.f);
+    // DESIGN IMPROVEMENT: More descriptive instruction with better styling
+    sf::Text instruction("Enter player names (2-6 players) and press Enter:", font, 20);
+    instruction.setFillColor(VisualStyle::TEXT_SECONDARY);
+    instruction.setPosition((window.getSize().x - instruction.getLocalBounds().width) / 2.f, 80.f);
 
-    sf::Text playerListText("", font, 20); // Ensure playerListText is also declared properly
-    playerListText.setFillColor(sf::Color::White);
-    playerListText.setPosition(200.f, 160.f);
+    // DESIGN IMPROVEMENT: Input field with modern styling and background
+    sf::RectangleShape inputBox(sf::Vector2f(400, 40));
+    inputBox.setPosition((window.getSize().x - inputBox.getSize().x) / 2.f, 120.f);
+    inputBox.setFillColor(VisualStyle::PRIMARY_LIGHT);
+    inputBox.setOutlineThickness(2.f);
+    inputBox.setOutlineColor(VisualStyle::ACCENT_BLUE);
 
-    sf::Text errorText("", font, 20);
-    errorText.setFillColor(sf::Color::Red);
-    errorText.setPosition(200.f, 130.f);
+    sf::Text inputText("", font, 20);
+    inputText.setFillColor(VisualStyle::TEXT_ACCENT);
+    inputText.setPosition(inputBox.getPosition().x + 10.f, inputBox.getPosition().y + 8.f);
 
-    sf::RectangleShape startGameButton(sf::Vector2f(200, 50));
-    startGameButton.setFillColor(sf::Color(0, 150, 0));
-    startGameButton.setPosition(300.f, 500.f);
+    // DESIGN IMPROVEMENT: Player list with card-like styling
+    sf::RectangleShape playerListBox(sf::Vector2f(350, 200));
+    playerListBox.setPosition((window.getSize().x - playerListBox.getSize().x) / 2.f, 180.f);
+    playerListBox.setFillColor(VisualStyle::PRIMARY_DARK);
+    playerListBox.setOutlineThickness(1.f);
+    playerListBox.setOutlineColor(VisualStyle::PRIMARY_LIGHT);
 
-    sf::Text startGameText("Start Game", font, 24);
-    startGameText.setFillColor(sf::Color::White);
-    startGameText.setPosition(startGameButton.getPosition().x + (startGameButton.getSize().x - startGameText.getLocalBounds().width) / 2.f, startGameButton.getPosition().y + 10.f);
+    sf::Text playerListTitle("Players Added:", font, 18);
+    playerListTitle.setFillColor(VisualStyle::TEXT_SECONDARY);
+    playerListTitle.setPosition(playerListBox.getPosition().x + 10.f, playerListBox.getPosition().y + 10.f);
+
+    sf::Text playerListText("", font, 16);
+    playerListText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    playerListText.setPosition(playerListBox.getPosition().x + 10.f, playerListBox.getPosition().y + 35.f);
+
+    // DESIGN IMPROVEMENT: Modern error message styling
+    sf::Text errorText("", font, 16);
+    errorText.setFillColor(VisualStyle::ACCENT_RED);
+    errorText.setPosition((window.getSize().x - 400) / 2.f, 400.f);
+
+    // DESIGN IMPROVEMENT: Enhanced start button with shadow
+    sf::Vector2f startButtonSize(220, 60);
+    sf::Vector2f startButtonPos((window.getSize().x - startButtonSize.x) / 2.f, 450.f);
+    
+    sf::RectangleShape startButtonShadow = createShadow(startButtonSize, startButtonPos, 4.f);
+    sf::RectangleShape startGameButton = createRoundedButton(startButtonSize, startButtonPos, VisualStyle::BUTTON_SUCCESS);
+
+    sf::Text startGameText("START GAME", font, 22);
+    startGameText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    startGameText.setStyle(sf::Text::Bold);
+    startGameText.setPosition(startButtonPos.x + (startButtonSize.x - startGameText.getLocalBounds().width) / 2.f, startButtonPos.y + 16.f);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -209,10 +323,11 @@ void GameGUI::showPlayerInputScreen() {
             }
         }
 
+        // Update display strings
         inputText.setString("> " + currentInput);
         std::string allPlayersStr;
-        for (const auto& name : playerNames) {
-            allPlayersStr += name + "\n";
+        for (size_t i = 0; i < playerNames.size(); ++i) {
+            allPlayersStr += std::to_string(i + 1) + ". " + playerNames[i] + "\n";
         }
         playerListText.setString(allPlayersStr);
 
@@ -221,16 +336,28 @@ void GameGUI::showPlayerInputScreen() {
         }
         errorText.setString(errorMessage);
 
-        window.clear();
+        // DESIGN IMPROVEMENT: Enhanced drawing with proper layering
+        window.clear(VisualStyle::PRIMARY_DARK);
         if (hasTexture) {
             window.draw(background);
         } else {
             window.draw(colorBackground);
         }
+        
+        // Draw UI elements with shadows
+        window.draw(startButtonShadow);
+        
+        // Draw main elements
+        window.draw(headerTitle);
         window.draw(instruction);
+        window.draw(inputBox);
         window.draw(inputText);
+        window.draw(playerListBox);
+        window.draw(playerListTitle);
         window.draw(playerListText);
+        
         if (!errorMessage.empty()) window.draw(errorText);
+        
         window.draw(startGameButton);
         window.draw(startGameText);
         window.display();
@@ -238,6 +365,7 @@ void GameGUI::showPlayerInputScreen() {
 }
 
 void GameGUI::showRoleRevealScreen(const std::vector<std::string>& playerNames) {
+    // DESIGN IMPROVEMENT: Modern background with enhanced styling
     sf::Texture bgTexture;
     sf::Sprite background;
     sf::RectangleShape colorBackground;
@@ -248,9 +376,9 @@ void GameGUI::showRoleRevealScreen(const std::vector<std::string>& playerNames) 
         background.setScale(window.getSize().x / (float)bgTexture.getSize().x, window.getSize().y / (float)bgTexture.getSize().y);
         hasTexture = true;
     } else {
-        // Fallback to colored background
+        // DESIGN IMPROVEMENT: Rich gradient-like background
         colorBackground.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
-        colorBackground.setFillColor(sf::Color(50, 100, 50)); // Dark green background
+        colorBackground.setFillColor(VisualStyle::PRIMARY_DARK);
     }
 
     std::vector<std::string> roles = {"General", "Governor", "Judge", "Merchant", "Baron", "Spy"};
@@ -264,17 +392,28 @@ void GameGUI::showRoleRevealScreen(const std::vector<std::string>& playerNames) 
         bool revealed = false;
         std::string assignedRole = roles[i % roles.size()];
 
-        sf::Text playerText(playerNames[i] + ", get ready...", font, 30);
-        playerText.setFillColor(sf::Color::White);
+        // DESIGN IMPROVEMENT: Enhanced player introduction with modern styling
+        sf::Text playerText(playerNames[i] + ", prepare for your role...", font, 28);
+        playerText.setFillColor(VisualStyle::TEXT_PRIMARY);
+        playerText.setStyle(sf::Text::Bold);
         playerText.setPosition((window.getSize().x - playerText.getLocalBounds().width) / 2.f, 150.f);
 
-        sf::RectangleShape revealButton(sf::Vector2f(200, 60));
-        revealButton.setFillColor(sf::Color(100, 100, 250));
-        revealButton.setPosition(300.f, 400.f);
+        // DESIGN IMPROVEMENT: Instruction text with better styling
+        sf::Text instructionText("Click the button when ready to reveal", font, 18);
+        instructionText.setFillColor(VisualStyle::TEXT_SECONDARY);
+        instructionText.setPosition((window.getSize().x - instructionText.getLocalBounds().width) / 2.f, 190.f);
 
-        sf::Text revealText("Reveal Role", font, 24);
-        revealText.setFillColor(sf::Color::White);
-        revealText.setPosition(revealButton.getPosition().x + (revealButton.getSize().x - revealText.getLocalBounds().width) / 2.f, revealButton.getPosition().y + 15.f);
+        // DESIGN IMPROVEMENT: Modern reveal button with shadow and enhanced styling
+        sf::Vector2f revealButtonSize(250, 70);
+        sf::Vector2f revealButtonPos((window.getSize().x - revealButtonSize.x) / 2.f, 350.f);
+        
+        sf::RectangleShape revealButtonShadow = createShadow(revealButtonSize, revealButtonPos, 5.f);
+        sf::RectangleShape revealButton = createRoundedButton(revealButtonSize, revealButtonPos, VisualStyle::BUTTON_PRIMARY);
+
+        sf::Text revealText("REVEAL ROLE", font, 24);
+        revealText.setFillColor(VisualStyle::TEXT_PRIMARY);
+        revealText.setStyle(sf::Text::Bold);
+        revealText.setPosition(revealButtonPos.x + (revealButtonSize.x - revealText.getLocalBounds().width) / 2.f, revealButtonPos.y + 20.f);
         
         sf::Clock revealTimer;
         bool waiting = false;
@@ -296,7 +435,7 @@ void GameGUI::showRoleRevealScreen(const std::vector<std::string>& playerNames) 
                 }
             }
 
-            window.clear();
+            window.clear(VisualStyle::PRIMARY_DARK);
             if (hasTexture) {
                 window.draw(background);
             } else {
@@ -304,21 +443,42 @@ void GameGUI::showRoleRevealScreen(const std::vector<std::string>& playerNames) 
             }
 
             if (waiting) {
-                sf::Text roleText("Your Role: " + assignedRole, font, 40);
-                roleText.setFillColor(sf::Color::Yellow);
-                roleText.setPosition((window.getSize().x - roleText.getLocalBounds().width) / 2.f, 200.f);
+                // DESIGN IMPROVEMENT: Role reveal with dramatic styling and card-like appearance
+                sf::RectangleShape roleCard(sf::Vector2f(400, 150));
+                roleCard.setPosition((window.getSize().x - roleCard.getSize().x) / 2.f, 200.f);
+                roleCard.setFillColor(VisualStyle::PRIMARY_MEDIUM);
+                roleCard.setOutlineThickness(3.f);
+                roleCard.setOutlineColor(VisualStyle::ACCENT_YELLOW);
+                
+                sf::RectangleShape roleCardShadow = createShadow(sf::Vector2f(400, 150), sf::Vector2f((window.getSize().x - 400) / 2.f, 200.f), 8.f);
+                
+                sf::Text roleText("Your Role: " + assignedRole, font, 32);
+                roleText.setFillColor(VisualStyle::TEXT_ACCENT);
+                roleText.setStyle(sf::Text::Bold);
+                roleText.setPosition((window.getSize().x - roleText.getLocalBounds().width) / 2.f, 240.f);
                 
                 playerText.setString(playerNames[i] + ", this is your role:");
                 playerText.setPosition((window.getSize().x - playerText.getLocalBounds().width) / 2.f, 100.f);
+                
+                // DESIGN IMPROVEMENT: Remember and strategize text
+                sf::Text strategyText("Remember your abilities and plan your strategy!", font, 16);
+                strategyText.setFillColor(VisualStyle::TEXT_SECONDARY);
+                strategyText.setPosition((window.getSize().x - strategyText.getLocalBounds().width) / 2.f, 300.f);
+                
+                window.draw(roleCardShadow);
+                window.draw(roleCard);
                 window.draw(playerText);
                 window.draw(roleText);
+                window.draw(strategyText);
                 
-                if (revealTimer.getElapsedTime().asSeconds() > 2.0f) {
+                if (revealTimer.getElapsedTime().asSeconds() > 2.5f) {
                     revealed = true;
                 }
             } else {
-                window.draw(playerText);
+                window.draw(revealButtonShadow);
                 window.draw(revealButton);
+                window.draw(playerText);
+                window.draw(instructionText);
                 window.draw(revealText);
             }
             
@@ -329,6 +489,7 @@ void GameGUI::showRoleRevealScreen(const std::vector<std::string>& playerNames) 
 }
 
 void GameGUI::runGameScreen() {
+    // DESIGN IMPROVEMENT: Enhanced game screen background
     sf::Texture bgTexture;
     sf::Sprite background;
     sf::RectangleShape colorBackground;
@@ -339,9 +500,9 @@ void GameGUI::runGameScreen() {
         background.setScale(static_cast<float>(window.getSize().x) / bgTexture.getSize().x, static_cast<float>(window.getSize().y) / bgTexture.getSize().y);
         hasTexture = true;
     } else {
-        // Fallback to colored background
+        // DESIGN IMPROVEMENT: Rich game table appearance
         colorBackground.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
-        colorBackground.setFillColor(sf::Color(80, 80, 80)); // Dark gray background
+        colorBackground.setFillColor(VisualStyle::PRIMARY_DARK);
     }
     
     while (window.isOpen()) {
@@ -402,57 +563,100 @@ void GameGUI::runGameScreen() {
         }
         std::string roleStr = roleToString(currentPlayer->getRoleType());
 
-        // Left side: Player Info
-        float leftMargin = 50.f;
-        float startY = 50.f;
-        float lineSpacing = 40.f;
-        sf::Text turnText(currentPlayer->getName() + "'s turn", font, 30);
-        turnText.setFillColor(sf::Color::White);
-        turnText.setPosition(leftMargin, startY);
+        // DESIGN IMPROVEMENT: Enhanced left panel with card-like player info
+        float leftMargin = 30.f;
+        float startY = 30.f;
+        
+        // Player info card background
+        sf::RectangleShape playerInfoCard(sf::Vector2f(350, 280));
+        playerInfoCard.setPosition(leftMargin, startY);
+        playerInfoCard.setFillColor(VisualStyle::PRIMARY_MEDIUM);
+        playerInfoCard.setOutlineThickness(2.f);
+        playerInfoCard.setOutlineColor(VisualStyle::ACCENT_BLUE);
+        
+        sf::RectangleShape playerInfoShadow = createShadow(sf::Vector2f(350, 280), sf::Vector2f(leftMargin, startY), 5.f);
+
+        // DESIGN IMPROVEMENT: Enhanced text styling with hierarchy
+        sf::Text turnText(currentPlayer->getName() + "'s Turn", font, 26);
+        turnText.setFillColor(VisualStyle::TEXT_ACCENT);
+        turnText.setStyle(sf::Text::Bold);
+        turnText.setPosition(leftMargin + 20.f, startY + 20.f);
 
         sf::Text roleText("Role: " + roleStr, font, 20);
-        roleText.setFillColor(sf::Color::White);
-        roleText.setPosition(leftMargin, startY + lineSpacing);
+        roleText.setFillColor(VisualStyle::TEXT_PRIMARY);
+        roleText.setPosition(leftMargin + 20.f, startY + 60.f);
 
         sf::Text coinsText("Coins: " + std::to_string(currentPlayer->getCoins()), font, 20);
-        coinsText.setFillColor(sf::Color::White);
-        coinsText.setPosition(leftMargin, startY + 2 * lineSpacing);
+        coinsText.setFillColor(VisualStyle::ACCENT_YELLOW);
+        coinsText.setStyle(sf::Text::Bold);
+        coinsText.setPosition(leftMargin + 20.f, startY + 90.f);
 
-        sf::Text statusText(std::string("Sanctioned: ") + (currentPlayer->isSanctioned() ? "Yes" : "No"), font, 20);
-        statusText.setFillColor(sf::Color::Red);
-        statusText.setPosition(leftMargin, startY + 3 * lineSpacing);
+        sf::Text statusText(std::string("Sanctioned: ") + (currentPlayer->isSanctioned() ? "Yes" : "No"), font, 18);
+        statusText.setFillColor(currentPlayer->isSanctioned() ? VisualStyle::ACCENT_RED : VisualStyle::ACCENT_GREEN);
+        statusText.setPosition(leftMargin + 20.f, startY + 120.f);
 
-        std::string alivePlayersStr = "Alive Players: ";
+        // DESIGN IMPROVEMENT: Active players list with better formatting
+        std::string alivePlayersStr = "Active Players:\n";
+        int playerCount = 0;
         for (const auto& p : game.getPlayers()) {
             if (p->isActive()) {
-                alivePlayersStr += p->getName() + " ";
+                alivePlayersStr += "• " + p->getName() + " (" + std::to_string(p->getCoins()) + " coins)\n";
+                playerCount++;
             }
         }
-        sf::Text alivePlayersText(alivePlayersStr, font, 18);
-        alivePlayersText.setFillColor(sf::Color::Cyan);
-        alivePlayersText.setPosition(leftMargin, startY + 5 * lineSpacing);
+        sf::Text alivePlayersText(alivePlayersStr, font, 16);
+        alivePlayersText.setFillColor(VisualStyle::TEXT_SECONDARY);
+        alivePlayersText.setPosition(leftMargin + 20.f, startY + 160.f);
         
-        // Right side: Action Buttons
+        // DESIGN IMPROVEMENT: Enhanced action buttons panel
         std::vector<ActionType> availableActions = currentPlayer->getAvailableActions();
         std::vector<sf::RectangleShape> actionButtons;
+        std::vector<sf::RectangleShape> actionShadows;
         std::vector<sf::Text> actionTexts;
-        float rightMargin = window.getSize().x - 250.f;
-        float buttonHeight = 45.f;
+        
+        float rightMargin = window.getSize().x - 280.f;
+        float buttonHeight = 50.f;
         float buttonSpacing = 15.f;
+        float actionStartY = startY + 20.f;
+
+        // Action panel background
+        sf::RectangleShape actionPanel(sf::Vector2f(250, static_cast<float>(availableActions.size() * (buttonHeight + buttonSpacing) + 40)));
+        actionPanel.setPosition(rightMargin, startY);
+        actionPanel.setFillColor(VisualStyle::PRIMARY_MEDIUM);
+        actionPanel.setOutlineThickness(2.f);
+        actionPanel.setOutlineColor(VisualStyle::ACCENT_PURPLE);
+        
+        sf::RectangleShape actionPanelShadow = createShadow(actionPanel.getSize(), actionPanel.getPosition(), 5.f);
+
+        sf::Text actionTitle("Available Actions", font, 18);
+        actionTitle.setFillColor(VisualStyle::TEXT_ACCENT);
+        actionTitle.setStyle(sf::Text::Bold);
+        actionTitle.setPosition(rightMargin + 10.f, startY + 10.f);
 
         size_t button_idx = 0;
         for (ActionType action : availableActions) {
             if (action == ActionType::cancel) continue; // "cancel" is not a player-initiated action button
             
-            sf::RectangleShape button(sf::Vector2f(200, buttonHeight));
-            button.setFillColor(sf::Color(150, 100, 100));
-            button.setPosition(rightMargin, startY + button_idx * (buttonHeight + buttonSpacing));
+            sf::Vector2f buttonSize(220, buttonHeight);
+            sf::Vector2f buttonPos(rightMargin + 15.f, actionStartY + 40.f + button_idx * (buttonHeight + buttonSpacing));
+            
+            // DESIGN IMPROVEMENT: Color-coded action buttons
+            sf::Color buttonColor = VisualStyle::BUTTON_PRIMARY;
+            if (action == ActionType::Coup) buttonColor = VisualStyle::BUTTON_DANGER;
+            else if (action == ActionType::Gather || action == ActionType::Tax) buttonColor = VisualStyle::BUTTON_SUCCESS;
+            else if (action == ActionType::Bribe) buttonColor = VisualStyle::BUTTON_WARNING;
+            
+            sf::RectangleShape buttonShadow = createShadow(buttonSize, buttonPos, 3.f);
+            sf::RectangleShape button = createRoundedButton(buttonSize, buttonPos, buttonColor);
+            
+            actionShadows.push_back(buttonShadow);
             actionButtons.push_back(button);
 
             std::string actionStr = actionTypeToString(action);
-            sf::Text text(actionStr, font, 20);
-            text.setFillColor(sf::Color::White);
-            text.setPosition(button.getPosition().x + (button.getSize().x - text.getLocalBounds().width) / 2.f, button.getPosition().y + 10.f);
+            sf::Text text(actionStr, font, 18);
+            text.setFillColor(VisualStyle::TEXT_PRIMARY);
+            text.setStyle(sf::Text::Bold);
+            text.setPosition(buttonPos.x + (buttonSize.x - text.getLocalBounds().width) / 2.f, buttonPos.y + 14.f);
             actionTexts.push_back(text);
             button_idx++;
         }
@@ -539,39 +743,87 @@ void GameGUI::runGameScreen() {
                 }
             }
 
-            // Drawing the screen
-            window.clear();
+            // DESIGN IMPROVEMENT: Enhanced drawing with proper layering and modern styling
+            window.clear(VisualStyle::PRIMARY_DARK);
             if (hasTexture) {
                 window.draw(background);
             } else {
                 window.draw(colorBackground);
             }
+            
+            // Draw shadows first
+            window.draw(playerInfoShadow);
+            window.draw(actionPanelShadow);
+            for (const auto& shadow : actionShadows) {
+                window.draw(shadow);
+            }
+            
+            // Draw main elements
+            window.draw(playerInfoCard);
+            window.draw(actionPanel);
+            
+            // Draw text content
             window.draw(turnText);
             window.draw(roleText);
             window.draw(coinsText);
             window.draw(statusText);
             window.draw(alivePlayersText);
+            window.draw(actionTitle);
 
+            // Draw action buttons and their text
             for (size_t i = 0; i < actionButtons.size(); ++i) {
                 window.draw(actionButtons[i]);
                 window.draw(actionTexts[i]);
             }
+            
             window.display();
         }
     }
 }
 
 std::string GameGUI::askForTargetPlayerName() {
-    sf::RenderWindow inputWindow(sf::VideoMode(400, 200), "Select Target", sf::Style::Titlebar | sf::Style::Close);
+    // DESIGN IMPROVEMENT: Modern modal window with enhanced styling
+    sf::RenderWindow inputWindow(sf::VideoMode(450, 250), "Select Target Player", sf::Style::Titlebar | sf::Style::Close);
     
-    sf::Text prompt("Enter target player name:", font, 20);
-    prompt.setFillColor(sf::Color::White);
-    prompt.setPosition(20, 30);
+    // Background with modern colors
+    sf::RectangleShape modalBackground(sf::Vector2f(450, 250));
+    modalBackground.setFillColor(VisualStyle::PRIMARY_MEDIUM);
+    
+    // DESIGN IMPROVEMENT: Enhanced prompt styling
+    sf::Text prompt("Enter target player name:", font, 22);
+    prompt.setFillColor(VisualStyle::TEXT_PRIMARY);
+    prompt.setStyle(sf::Text::Bold);
+    prompt.setPosition(30, 40);
+
+    // DESIGN IMPROVEMENT: Input field with modern styling
+    sf::RectangleShape inputBox(sf::Vector2f(390, 40));
+    inputBox.setPosition(30, 80);
+    inputBox.setFillColor(VisualStyle::PRIMARY_LIGHT);
+    inputBox.setOutlineThickness(2.f);
+    inputBox.setOutlineColor(VisualStyle::ACCENT_BLUE);
 
     std::string inputText;
-    sf::Text inputDisplay("", font, 20);
-    inputDisplay.setFillColor(sf::Color::Yellow);
-    inputDisplay.setPosition(20, 70);
+    sf::Text inputDisplay("", font, 18);
+    inputDisplay.setFillColor(VisualStyle::TEXT_ACCENT);
+    inputDisplay.setPosition(40, 88);
+
+    // DESIGN IMPROVEMENT: Modern cancel and confirm buttons
+    sf::Vector2f buttonSize(100, 35);
+    sf::RectangleShape cancelButton = createRoundedButton(buttonSize, sf::Vector2f(240, 170), VisualStyle::BUTTON_DANGER);
+    sf::RectangleShape confirmButton = createRoundedButton(buttonSize, sf::Vector2f(350, 170), VisualStyle::BUTTON_SUCCESS);
+    
+    sf::Text cancelText("Cancel", font, 16);
+    cancelText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    cancelText.setPosition(265, 180);
+    
+    sf::Text confirmText("Confirm", font, 16);
+    confirmText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    confirmText.setPosition(370, 180);
+
+    // Instruction text
+    sf::Text instructionText("Press Enter to confirm or click Cancel", font, 14);
+    instructionText.setFillColor(VisualStyle::TEXT_SECONDARY);
+    instructionText.setPosition(30, 140);
 
     while (inputWindow.isOpen()) {
         sf::Event event;
@@ -591,16 +843,36 @@ std::string GameGUI::askForTargetPlayerName() {
                 }
                 inputDisplay.setString("> " + inputText);
             }
+            if (event.type == sf::Event::MouseButtonPressed) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(inputWindow);
+                if (cancelButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+                    inputWindow.close();
+                    return "";
+                }
+                if (confirmButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)) && !inputText.empty()) {
+                    inputWindow.close();
+                    return inputText;
+                }
+            }
         }
-        inputWindow.clear(sf::Color(30, 30, 30));
+        
+        inputWindow.clear(VisualStyle::PRIMARY_DARK);
+        inputWindow.draw(modalBackground);
         inputWindow.draw(prompt);
+        inputWindow.draw(inputBox);
         inputWindow.draw(inputDisplay);
+        inputWindow.draw(instructionText);
+        inputWindow.draw(cancelButton);
+        inputWindow.draw(confirmButton);
+        inputWindow.draw(cancelText);
+        inputWindow.draw(confirmText);
         inputWindow.display();
     }
     return inputText;
 }
 
 void GameGUI::showWinnerScreen(const std::string& winnerName) {
+    // DESIGN IMPROVEMENT: Dramatic winner screen with enhanced styling
     sf::Texture bgTexture;
     sf::Sprite background;
     sf::RectangleShape colorBackground;
@@ -611,27 +883,65 @@ void GameGUI::showWinnerScreen(const std::string& winnerName) {
         background.setScale(window.getSize().x / (float)bgTexture.getSize().x, window.getSize().y / (float)bgTexture.getSize().y);
         hasTexture = true;
     } else {
-        // Fallback to colored background
+        // DESIGN IMPROVEMENT: Celebration gradient background
         colorBackground.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
-        colorBackground.setFillColor(sf::Color(100, 100, 0)); // Dark yellow background
+        colorBackground.setFillColor(VisualStyle::PRIMARY_DARK);
     }
 
-    sf::Text gameOverText("GAME OVER", font, 60);
-    gameOverText.setFillColor(sf::Color(255, 50, 50));
-    gameOverText.setStyle(sf::Text::Bold | sf::Text::Underlined);
-    gameOverText.setPosition((window.getSize().x - gameOverText.getLocalBounds().width) / 2.f, 100.f);
+    // DESIGN IMPROVEMENT: Dramatic "GAME OVER" with enhanced styling
+    sf::Text gameOverText("GAME OVER", font, 72);
+    gameOverText.setFillColor(VisualStyle::ACCENT_RED);
+    gameOverText.setStyle(sf::Text::Bold);
+    gameOverText.setPosition((window.getSize().x - gameOverText.getLocalBounds().width) / 2.f, 80.f);
+    
+    // Add outline effect for drama
+    sf::Text gameOverOutline("GAME OVER", font, 72);
+    gameOverOutline.setFillColor(sf::Color::Transparent);
+    gameOverOutline.setOutlineColor(sf::Color(100, 0, 0));
+    gameOverOutline.setOutlineThickness(3.f);
+    gameOverOutline.setStyle(sf::Text::Bold);
+    gameOverOutline.setPosition((window.getSize().x - gameOverOutline.getLocalBounds().width) / 2.f, 80.f);
 
-    sf::Text winText("Winner: " + winnerName, font, 40);
-    winText.setFillColor(sf::Color(255, 215, 0));
-    winText.setPosition((window.getSize().x - winText.getLocalBounds().width) / 2.f, 250.f);
+    // DESIGN IMPROVEMENT: Winner announcement with celebration styling
+    sf::RectangleShape winnerCard(sf::Vector2f(500, 120));
+    winnerCard.setPosition((window.getSize().x - winnerCard.getSize().x) / 2.f, 200.f);
+    winnerCard.setFillColor(VisualStyle::PRIMARY_MEDIUM);
+    winnerCard.setOutlineThickness(4.f);
+    winnerCard.setOutlineColor(VisualStyle::ACCENT_YELLOW);
+    
+    sf::RectangleShape winnerCardShadow = createShadow(sf::Vector2f(500, 120), sf::Vector2f((window.getSize().x - 500) / 2.f, 200.f), 8.f);
 
-    sf::RectangleShape exitButton(sf::Vector2f(200, 60));
-    exitButton.setPosition((window.getSize().x - exitButton.getSize().x) / 2.f, 400.f);
-    exitButton.setFillColor(sf::Color(70, 130, 180));
+    sf::Text winLabel("🏆 WINNER 🏆", font, 28);
+    winLabel.setFillColor(VisualStyle::ACCENT_YELLOW);
+    winLabel.setStyle(sf::Text::Bold);
+    winLabel.setPosition((window.getSize().x - winLabel.getLocalBounds().width) / 2.f, 220.f);
 
-    sf::Text buttonText("Exit Game", font, 26);
-    buttonText.setFillColor(sf::Color::White);
-    buttonText.setPosition(exitButton.getPosition().x + (exitButton.getSize().x - buttonText.getLocalBounds().width) / 2.f, exitButton.getPosition().y + 15.f);
+    sf::Text winText(winnerName, font, 48);
+    winText.setFillColor(VisualStyle::TEXT_ACCENT);
+    winText.setStyle(sf::Text::Bold);
+    winText.setPosition((window.getSize().x - winText.getLocalBounds().width) / 2.f, 260.f);
+
+    // DESIGN IMPROVEMENT: Celebration message
+    sf::Text celebrationText("Congratulations! You have mastered the art of political intrigue!", font, 18);
+    celebrationText.setFillColor(VisualStyle::TEXT_SECONDARY);
+    celebrationText.setPosition((window.getSize().x - celebrationText.getLocalBounds().width) / 2.f, 380.f);
+
+    // DESIGN IMPROVEMENT: Enhanced exit button with modern styling
+    sf::Vector2f exitButtonSize(200, 60);
+    sf::Vector2f exitButtonPos((window.getSize().x - exitButtonSize.x) / 2.f, 480.f);
+    
+    sf::RectangleShape exitButtonShadow = createShadow(exitButtonSize, exitButtonPos, 6.f);
+    sf::RectangleShape exitButton = createRoundedButton(exitButtonSize, exitButtonPos, VisualStyle::BUTTON_DANGER);
+
+    sf::Text buttonText("EXIT GAME", font, 24);
+    buttonText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    buttonText.setStyle(sf::Text::Bold);
+    buttonText.setPosition(exitButtonPos.x + (exitButtonSize.x - buttonText.getLocalBounds().width) / 2.f, exitButtonPos.y + 16.f);
+
+    // DESIGN IMPROVEMENT: Play again suggestion
+    sf::Text playAgainText("Thanks for playing! Click Exit to close the game.", font, 16);
+    playAgainText.setFillColor(VisualStyle::TEXT_SECONDARY);
+    playAgainText.setPosition((window.getSize().x - playAgainText.getLocalBounds().width) / 2.f, 580.f);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -645,17 +955,38 @@ void GameGUI::showWinnerScreen(const std::string& winnerName) {
                     window.close();
                 }
             }
+            // DESIGN IMPROVEMENT: Allow Escape key to exit
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+                window.close();
+            }
         }
-        window.clear();
+        
+        window.clear(VisualStyle::PRIMARY_DARK);
         if (hasTexture) {
             window.draw(background);
         } else {
             window.draw(colorBackground);
         }
+        
+        // Draw shadows first
+        window.draw(winnerCardShadow);
+        window.draw(exitButtonShadow);
+        
+        // Draw outline first, then main text
+        window.draw(gameOverOutline);
         window.draw(gameOverText);
+        
+        // Draw winner celebration
+        window.draw(winnerCard);
+        window.draw(winLabel);
         window.draw(winText);
+        window.draw(celebrationText);
+        
+        // Draw exit button
         window.draw(exitButton);
         window.draw(buttonText);
+        window.draw(playAgainText);
+        
         window.display();
     }
 }
@@ -670,19 +1001,55 @@ void GameGUI::viewPlayerCoinsPopup(const std::string& targetName) {
     }
     if (!target) return; // Should not happen if logic is correct
 
-    sf::RenderWindow popupWindow(sf::VideoMode(400, 200), "Spy Report", sf::Style::Titlebar | sf::Style::Close);
+    // DESIGN IMPROVEMENT: Enhanced spy report window with modern styling
+    sf::RenderWindow popupWindow(sf::VideoMode(450, 280), "🕵️ Spy Report", sf::Style::Titlebar | sf::Style::Close);
     
-    sf::Text infoText(targetName + " has " + std::to_string(target->getCoins()) + " coins.", font, 24);
-    infoText.setFillColor(sf::Color::White);
-    infoText.setPosition((popupWindow.getSize().x - infoText.getLocalBounds().width) / 2.f, 60.f);
+    // Background
+    sf::RectangleShape modalBackground(sf::Vector2f(450, 280));
+    modalBackground.setFillColor(VisualStyle::PRIMARY_MEDIUM);
+    
+    // DESIGN IMPROVEMENT: Spy-themed header
+    sf::Text headerText("SPY INTELLIGENCE REPORT", font, 20);
+    headerText.setFillColor(VisualStyle::ACCENT_PURPLE);
+    headerText.setStyle(sf::Text::Bold);
+    headerText.setPosition((popupWindow.getSize().x - headerText.getLocalBounds().width) / 2.f, 30.f);
+    
+    // DESIGN IMPROVEMENT: Target info card
+    sf::RectangleShape infoCard(sf::Vector2f(380, 100));
+    infoCard.setPosition(35, 80);
+    infoCard.setFillColor(VisualStyle::PRIMARY_DARK);
+    infoCard.setOutlineThickness(2.f);
+    infoCard.setOutlineColor(VisualStyle::ACCENT_YELLOW);
+    
+    sf::Text targetLabel("Target Player:", font, 16);
+    targetLabel.setFillColor(VisualStyle::TEXT_SECONDARY);
+    targetLabel.setPosition(50, 100);
+    
+    sf::Text targetText(targetName, font, 24);
+    targetText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    targetText.setStyle(sf::Text::Bold);
+    targetText.setPosition(50, 125);
+    
+    sf::Text coinsLabel("Current Wealth:", font, 16);
+    coinsLabel.setFillColor(VisualStyle::TEXT_SECONDARY);
+    coinsLabel.setPosition(50, 155);
+    
+    sf::Text infoText(std::to_string(target->getCoins()) + " coins", font, 24);
+    infoText.setFillColor(VisualStyle::ACCENT_YELLOW);
+    infoText.setStyle(sf::Text::Bold);
+    infoText.setPosition(200, 155);
 
-    sf::RectangleShape okButton(sf::Vector2f(100, 40));
-    okButton.setFillColor(sf::Color(100, 200, 250));
-    okButton.setPosition((popupWindow.getSize().x - okButton.getSize().x) / 2.f, 130.f);
+    // DESIGN IMPROVEMENT: Modern OK button
+    sf::Vector2f okButtonSize(120, 40);
+    sf::Vector2f okButtonPos((popupWindow.getSize().x - okButtonSize.x) / 2.f, 210.f);
+    
+    sf::RectangleShape okButtonShadow = createShadow(okButtonSize, okButtonPos, 3.f);
+    sf::RectangleShape okButton = createRoundedButton(okButtonSize, okButtonPos, VisualStyle::BUTTON_SUCCESS);
 
-    sf::Text okText("OK", font, 20);
-    okText.setFillColor(sf::Color::Black);
-    okText.setPosition(okButton.getPosition().x + (okButton.getSize().x - okText.getLocalBounds().width) / 2.f, okButton.getPosition().y + 7.f);
+    sf::Text okText("GOT IT", font, 18);
+    okText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    okText.setStyle(sf::Text::Bold);
+    okText.setPosition(okButtonPos.x + (okButtonSize.x - okText.getLocalBounds().width) / 2.f, okButtonPos.y + 10.f);
 
     while (popupWindow.isOpen()) {
         sf::Event event;
@@ -694,10 +1061,20 @@ void GameGUI::viewPlayerCoinsPopup(const std::string& targetName) {
                     popupWindow.close();
                 }
             }
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+                popupWindow.close();
+            }
         }
 
-        popupWindow.clear(sf::Color(30, 30, 30));
+        popupWindow.clear(VisualStyle::PRIMARY_DARK);
+        popupWindow.draw(modalBackground);
+        popupWindow.draw(headerText);
+        popupWindow.draw(infoCard);
+        popupWindow.draw(targetLabel);
+        popupWindow.draw(targetText);
+        popupWindow.draw(coinsLabel);
         popupWindow.draw(infoText);
+        popupWindow.draw(okButtonShadow);
         popupWindow.draw(okButton);
         popupWindow.draw(okText);
         popupWindow.display();
@@ -705,25 +1082,54 @@ void GameGUI::viewPlayerCoinsPopup(const std::string& targetName) {
 }
 
 std::string GameGUI::showCancelConfirmation(const std::string& playerName) {
-    sf::RenderWindow popupWindow(sf::VideoMode(460, 250), "Cancel Action?", sf::Style::Titlebar);
+    // DESIGN IMPROVEMENT: Enhanced cancel confirmation with dramatic styling
+    sf::RenderWindow popupWindow(sf::VideoMode(500, 300), "🚫 Cancel Action?", sf::Style::Titlebar);
 
-    sf::Text questionText(playerName + ", do you want to cancel?", font, 22);
-    questionText.setFillColor(sf::Color::White);
-    questionText.setPosition((popupWindow.getSize().x - questionText.getLocalBounds().width) / 2.f, 40.f);
+    // Background
+    sf::RectangleShape modalBackground(sf::Vector2f(500, 300));
+    modalBackground.setFillColor(VisualStyle::PRIMARY_MEDIUM);
+    
+    // DESIGN IMPROVEMENT: Attention-grabbing header
+    sf::Text headerText("ACTION CANCELLATION", font, 18);
+    headerText.setFillColor(VisualStyle::ACCENT_RED);
+    headerText.setStyle(sf::Text::Bold);
+    headerText.setPosition((popupWindow.getSize().x - headerText.getLocalBounds().width) / 2.f, 30.f);
 
-    sf::RectangleShape yesButton(sf::Vector2f(120, 50));
-    yesButton.setFillColor(sf::Color(70, 200, 70));
-    yesButton.setPosition(60.f, 150.f);
-    sf::Text yesText("Yes", font, 22);
-    yesText.setFillColor(sf::Color::Black);
-    yesText.setPosition(yesButton.getPosition().x + (yesButton.getSize().x - yesText.getLocalBounds().width) / 2.f, yesButton.getPosition().y + 10.f);
+    // DESIGN IMPROVEMENT: Player name with emphasis
+    sf::Text playerText(playerName, font, 28);
+    playerText.setFillColor(VisualStyle::TEXT_ACCENT);
+    playerText.setStyle(sf::Text::Bold);
+    playerText.setPosition((popupWindow.getSize().x - playerText.getLocalBounds().width) / 2.f, 70.f);
+    
+    sf::Text questionText("Do you want to cancel the current action?", font, 20);
+    questionText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    questionText.setPosition((popupWindow.getSize().x - questionText.getLocalBounds().width) / 2.f, 110.f);
+    
+    // DESIGN IMPROVEMENT: Warning message
+    sf::Text warningText("⚠️ This decision is final and cannot be undone", font, 16);
+    warningText.setFillColor(VisualStyle::TEXT_SECONDARY);
+    warningText.setPosition((popupWindow.getSize().x - warningText.getLocalBounds().width) / 2.f, 150.f);
 
-    sf::RectangleShape noButton(sf::Vector2f(120, 50));
-    noButton.setFillColor(sf::Color(200, 70, 70));
-    noButton.setPosition(280.f, 150.f);
-    sf::Text noText("No", font, 22);
-    noText.setFillColor(sf::Color::Black);
-    noText.setPosition(noButton.getPosition().x + (noButton.getSize().x - noText.getLocalBounds().width) / 2.f, noButton.getPosition().y + 10.f);
+    // DESIGN IMPROVEMENT: Enhanced Yes/No buttons with proper styling
+    sf::Vector2f buttonSize(140, 50);
+    sf::Vector2f yesButtonPos(80.f, 200.f);
+    sf::Vector2f noButtonPos(280.f, 200.f);
+    
+    sf::RectangleShape yesButtonShadow = createShadow(buttonSize, yesButtonPos, 4.f);
+    sf::RectangleShape noButtonShadow = createShadow(buttonSize, noButtonPos, 4.f);
+    
+    sf::RectangleShape yesButton = createRoundedButton(buttonSize, yesButtonPos, VisualStyle::BUTTON_DANGER);
+    sf::RectangleShape noButton = createRoundedButton(buttonSize, noButtonPos, VisualStyle::BUTTON_SUCCESS);
+    
+    sf::Text yesText("YES, CANCEL", font, 16);
+    yesText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    yesText.setStyle(sf::Text::Bold);
+    yesText.setPosition(yesButtonPos.x + (buttonSize.x - yesText.getLocalBounds().width) / 2.f, yesButtonPos.y + 16.f);
+
+    sf::Text noText("NO, CONTINUE", font, 16);
+    noText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    noText.setStyle(sf::Text::Bold);
+    noText.setPosition(noButtonPos.x + (buttonSize.x - noText.getLocalBounds().width) / 2.f, noButtonPos.y + 16.f);
 
     while (popupWindow.isOpen()) {
         sf::Event event;
@@ -743,33 +1149,88 @@ std::string GameGUI::showCancelConfirmation(const std::string& playerName) {
                     return "no";
                 }
             }
+            // DESIGN IMPROVEMENT: Keyboard shortcuts
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Y) {
+                    popupWindow.close();
+                    return "yes";
+                }
+                if (event.key.code == sf::Keyboard::N || event.key.code == sf::Keyboard::Escape) {
+                    popupWindow.close();
+                    return "no";
+                }
+            }
         }
 
-        popupWindow.clear(sf::Color(50, 50, 50));
+        popupWindow.clear(VisualStyle::PRIMARY_DARK);
+        popupWindow.draw(modalBackground);
+        popupWindow.draw(headerText);
+        popupWindow.draw(playerText);
         popupWindow.draw(questionText);
+        popupWindow.draw(warningText);
+        
+        // Draw shadows first
+        popupWindow.draw(yesButtonShadow);
+        popupWindow.draw(noButtonShadow);
+        
+        // Draw buttons and text
         popupWindow.draw(yesButton);
-        popupWindow.draw(yesText);
         popupWindow.draw(noButton);
+        popupWindow.draw(yesText);
         popupWindow.draw(noText);
+        
         popupWindow.display();
     }
     return "no";
 }
 
 void GameGUI::showErrorPopup(const std::string& errorMessage) {
-    sf::RenderWindow popupWindow(sf::VideoMode(500, 200), "Error", sf::Style::Titlebar | sf::Style::Close);
+    // DESIGN IMPROVEMENT: Enhanced error popup with modern styling
+    sf::RenderWindow popupWindow(sf::VideoMode(550, 250), "⚠️ Error", sf::Style::Titlebar | sf::Style::Close);
 
-    sf::Text message(errorMessage, font, 20);
-    message.setFillColor(sf::Color(255, 80, 80));
-    message.setPosition((popupWindow.getSize().x - message.getLocalBounds().width) / 2.f, 50.f);
+    // Background
+    sf::RectangleShape modalBackground(sf::Vector2f(550, 250));
+    modalBackground.setFillColor(VisualStyle::PRIMARY_MEDIUM);
+    
+    // DESIGN IMPROVEMENT: Error header with warning styling
+    sf::Text headerText("ERROR OCCURRED", font, 20);
+    headerText.setFillColor(VisualStyle::ACCENT_RED);
+    headerText.setStyle(sf::Text::Bold);
+    headerText.setPosition((popupWindow.getSize().x - headerText.getLocalBounds().width) / 2.f, 30.f);
+    
+    // DESIGN IMPROVEMENT: Error message card
+    sf::RectangleShape errorCard(sf::Vector2f(480, 80));
+    errorCard.setPosition(35, 70);
+    errorCard.setFillColor(VisualStyle::PRIMARY_DARK);
+    errorCard.setOutlineThickness(2.f);
+    errorCard.setOutlineColor(VisualStyle::ACCENT_RED);
 
-    sf::RectangleShape okButton(sf::Vector2f(120, 40));
-    okButton.setFillColor(sf::Color(200, 100, 100));
-    okButton.setPosition((popupWindow.getSize().x - okButton.getSize().x) / 2.f, 130.f);
+    // DESIGN IMPROVEMENT: Better text wrapping and styling
+    sf::Text message(errorMessage, font, 18);
+    message.setFillColor(VisualStyle::TEXT_PRIMARY);
+    message.setPosition(50, 95);
+    
+    // Simple text wrapping for long messages
+    std::string wrappedMessage = errorMessage;
+    if (wrappedMessage.length() > 50) {
+        size_t pos = wrappedMessage.find(' ', 40);
+        if (pos != std::string::npos && pos < wrappedMessage.length() - 10) {
+            wrappedMessage.insert(pos, "\n");
+        }
+    }
+    message.setString(wrappedMessage);
 
-    sf::Text okText("OK", font, 20);
-    okText.setFillColor(sf::Color::White);
-    okText.setPosition(okButton.getPosition().x + (okButton.getSize().x - okText.getLocalBounds().width) / 2.f, okButton.getPosition().y + 5.f);
+    // DESIGN IMPROVEMENT: Modern OK button
+    sf::Vector2f okButtonSize(140, 40);
+    sf::Vector2f okButtonPos((popupWindow.getSize().x - okButtonSize.x) / 2.f, 180.f);
+    
+    sf::RectangleShape okButtonShadow = createShadow(okButtonSize, okButtonPos, 3.f);
+    sf::RectangleShape okButton = createRoundedButton(okButtonSize, okButtonPos, VisualStyle::BUTTON_DANGER);
+
+    sf::Text okText("UNDERSTOOD", font, 16);
+    okText.setFillColor(VisualStyle::TEXT_PRIMARY);
+    okText.setStyle(sf::Text::Bold);
+    okText.setPosition(okButtonPos.x + (okButtonSize.x - okText.getLocalBounds().width) / 2.f, okButtonPos.y + 11.f);
 
     while (popupWindow.isOpen()) {
         sf::Event event;
@@ -783,9 +1244,18 @@ void GameGUI::showErrorPopup(const std::string& errorMessage) {
                     popupWindow.close();
                 }
             }
+            // DESIGN IMPROVEMENT: Allow Enter key to close
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+                popupWindow.close();
+            }
         }
-        popupWindow.clear(sf::Color(50, 20, 20));
+        
+        popupWindow.clear(VisualStyle::PRIMARY_DARK);
+        popupWindow.draw(modalBackground);
+        popupWindow.draw(headerText);
+        popupWindow.draw(errorCard);
         popupWindow.draw(message);
+        popupWindow.draw(okButtonShadow);
         popupWindow.draw(okButton);
         popupWindow.draw(okText);
         popupWindow.display();
