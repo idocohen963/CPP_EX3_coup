@@ -4,16 +4,13 @@
 # It also includes rules for cleaning up build artifacts and running tests with Valgrind.
 
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -pedantic -g
+CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -pedantic -g -I
 
 # Source directories
 PLAYER_DIR = PLAYER
 GAME_DIR = GAME
 GUI_DIR = GUI
 TEST_DIR = TEST
-
-# Add include paths - root directory so relative paths work
-CXXFLAGS += -I.
 
 # SFML libraries
 SFML_LIBS = -lsfml-graphics -lsfml-window -lsfml-system
@@ -47,7 +44,7 @@ TEST_TARGET = test_exec
 # GUI Demo
 GUI_DEMO_SRCS = $(GUI_DIR)/gui_demo.cpp
 GUI_DEMO_OBJS = $(GUI_DEMO_SRCS:.cpp=.o) $(GUI_SRCS:.cpp=.o) $(COMMON_OBJS)
-GUI_TARGET = gui_demo
+GUI_TARGET = gui_exec
 
 # Default target
 all: demo test gui
@@ -78,12 +75,6 @@ $(GUI_TARGET): $(GUI_DEMO_OBJS)
 	$(CXX) $(CXXFLAGS) -o $(GUI_TARGET) $(GUI_DEMO_OBJS) $(SFML_LIBS)
 
 # Valgrind targets
-valgrind_test: $(TEST_TARGET)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TEST_TARGET)
-
-valgrind_demo: $(DEMO_TARGET)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(DEMO_TARGET)
-
 valgrind: $(TEST_TARGET) $(DEMO_TARGET)
 	@echo "=== Running Valgrind on Tests ==="
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TEST_TARGET)
@@ -95,4 +86,4 @@ clean:
 	rm -f $(PLAYER_DIR)/*.o $(GAME_DIR)/*.o $(GUI_DIR)/*.o $(TEST_DIR)/*.o *.o
 	rm -f $(DEMO_TARGET) $(TEST_TARGET) $(GUI_TARGET)
 
-.PHONY: all demo test gui valgrind valgrind_test valgrind_demo clean
+.PHONY: all demo test gui valgrind clean
