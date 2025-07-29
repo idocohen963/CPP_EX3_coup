@@ -4,8 +4,7 @@
 # It also includes rules for cleaning up build artifacts and running tests with Valgrind.
 
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -pedantic -g -I
-
+CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -pedantic -g -I. -IPLAYER -IGAME -IGUI
 # Source directories
 PLAYER_DIR = PLAYER
 GAME_DIR = GAME

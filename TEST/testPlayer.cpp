@@ -50,7 +50,7 @@ std::vector<Player*> createThreePlayerGame() {
 // PLAYER CLASS BASIC FUNCTIONALITY TESTS
 // ============================================================
 
-TEST_CASE("Player Basic Actions - Happy Path") {
+TEST_CASE("Player Basic Actions") {
     resetGame();
     
     SUBCASE("Gather action - player receives one coin and turn advances") {
@@ -88,7 +88,7 @@ TEST_CASE("Player Basic Actions - Happy Path") {
     }
 }
 
-TEST_CASE("Player Coup Action - Happy Path") {
+TEST_CASE("Player Coup Action ") {
     resetGame();
     
     SUBCASE("Coup with exactly 7 coins removes target player") {
@@ -131,7 +131,7 @@ TEST_CASE("Player Coup Action - Happy Path") {
     }
 }
 
-TEST_CASE("Player Sanction Action - Happy Path") {
+TEST_CASE("Player Sanction Action ") {
     resetGame();
     
     SUBCASE("Sanction with exactly 3 coins works correctly") {
@@ -151,7 +151,7 @@ TEST_CASE("Player Sanction Action - Happy Path") {
     }
 }
 
-TEST_CASE("Player Arrest Action - Happy Path") {
+TEST_CASE("Player Arrest Action ") {
     resetGame();
     
     SUBCASE("Basic arrest - attacker gains 1 coin, target loses 1 coin") {
@@ -173,7 +173,7 @@ TEST_CASE("Player Arrest Action - Happy Path") {
     }
 }
 
-TEST_CASE("Player Bribe Action - Happy Path") {
+TEST_CASE("Player Bribe Action ") {
     resetGame();
     
     SUBCASE("Bribe with exactly 4 coins - turn does not advance") {

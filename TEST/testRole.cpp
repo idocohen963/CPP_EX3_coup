@@ -280,7 +280,7 @@ TEST_SUITE("Role Specific Tests") {
         Game& game = Game::getInstance();
         game.reset();
         
-        SUBCASE("Judge cancel bribe action - happy path") {
+        SUBCASE("Judge cancel bribe action ") {
             Player* player1 = game.addPlayer("Player1", "Spy");
             Player* judge = game.addPlayer("Judge1", "Judge");
             game.startGame();

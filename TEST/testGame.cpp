@@ -49,7 +49,7 @@ void createFullGame(Game& game) {
 }
 
 // ============================================================
-// BASIC FUNCTIONALITY TESTS (Happy Path)
+// BASIC FUNCTIONALITY TESTS 
 // ============================================================
 
 TEST_CASE("Game creation using Singleton pattern") {
