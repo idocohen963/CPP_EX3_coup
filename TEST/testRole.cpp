@@ -1,3 +1,4 @@
+// idocohen963@gmail.com
 #include "doctest.h"
 #include "GAME/game.hpp"
 #include "PLAYER/PlayerFactory.hpp"

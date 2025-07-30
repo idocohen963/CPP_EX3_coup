@@ -1,3 +1,4 @@
+// idocohen963@gmail.com
 #include "GameGUI.hpp"
 #include "GAME/game.hpp"
 #include <iostream>
